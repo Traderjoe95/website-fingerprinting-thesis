@@ -2,19 +2,21 @@
 
 This repository is home to the Master Thesis of Johannes Leupold at TU Darmstadt.
 
-## Structure
+The preliminary structure, together with projected page counts is listed below.
+
+## Structure (27-29 p.)
 
 ### 1. Introduction (2 p.)
 
 * The overall setting and relevance of WF research
 
-### 2. Website Fingerprinting (6 p.)
+### 2. Website Fingerprinting and Defenses (6 - 7 p.)
 
 #### 2.1. Theoretical Setting (2 p.)
 
 * Packet Traces
 * Threat Model
-* Defenses
+* Defenses (deterministic, randomized, morphing)
 
 #### 2.2. Gaussian Padding (0.5 - 1 p.)
 
@@ -25,18 +27,18 @@ This repository is home to the Master Thesis of Johannes Leupold at TU Darmstadt
 * Early Attacks (Liberatore & Levine, Herrmann et al.)
 * More Sophisticated Attacks (Panchenko, Dyer)
 * Modern Attacks (Wang et al., Panchenko et al., Hayes & Danezis)
-* Defenses (deterministic, randomized, morphing)
+* Morphing Defenses (Traffic Morphing, BuFLO, Tamaraw)
 * Security Bound Estimation (Cherubin)
 
-### 3. Experimental Methodology (5 p.)
+### 3. Experimental Methodology (5 - 6 p.)
 
-#### 3.1. A Generic Framework (1.5 p.)
+#### 3.1. A Generic Framework (1.5- 2 p.)
 
 * Why?
 * Design choices and priorities
 * Library choices (scikit-learn, ...)
 
-#### 3.2. Dataset Quality (0.5 p.)
+#### 3.2. Dataset Quality (0.5 - 1 p.)
 
 * Poor quality of the Liberatore dataset and measures taken to improve the used data
 
@@ -49,7 +51,7 @@ This repository is home to the Master Thesis of Johannes Leupold at TU Darmstadt
   * Attack (Classifier)
 * Parameterization
 
-### 3.4. Error Bound Estimation (1.5 p.)
+#### 3.4. Error Bound Estimation (1.5 p.)
 
 ### 4. Results (6 p.)
 
@@ -58,7 +60,7 @@ This repository is home to the Master Thesis of Johannes Leupold at TU Darmstadt
 * Performance against multiple attacks (as compared to no defense)
 * Performance compared with uniform padding, significant difference?
 
-#### 4.3. Security Bounds for Uniform Padding and Gaussian Padding
+#### 4.2. Security Bounds for Uniform Padding and Gaussian Padding
 
 * Lower classifier error bounds for both padding distributions wrt. some modern feature sets
 
