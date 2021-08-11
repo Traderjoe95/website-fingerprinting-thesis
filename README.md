@@ -18,13 +18,13 @@ The preliminary structure, together with projected page counts is listed below.
 * Packet Traces
 * Threat Model
 * Attacks (ML techniques)
-* Defenses (deterministic, randomized, morphing)
+* Countermeasures (deterministic padding, randomized padding, noise, morphing)
 
 #### 2.2. Gaussian Padding (0.5 - 1 p.)
 
 * The definition of gaussian padding
 
-#### 2.3. Security Bound Estimation [Cherubin] (1 - 1.5 p)
+#### 2.3. Security Bound Estimation according to Cherubin (1 - 1.5 p)
 
 * How are security bounds estimated? What is the rationale behind it?
 
@@ -38,7 +38,7 @@ The preliminary structure, together with projected page counts is listed below.
 
 ### 4. Experimental Methodology (5 - 6 p.)
 
-#### 4.1. Data (1 - 2 p.)
+#### 4.1. Trace Data (1 - 2 p.)
 
 * The Liberatore dataset
 * Poor quality of the Liberatore dataset

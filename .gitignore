@@ -14,5 +14,6 @@
 *.xmpdata
 *.xmpi
 
-# JabRef backup file
+# JabRef backup files
 *.bib.bak
+*.bib.sav
