@@ -4,25 +4,31 @@ This repository is home to the Master Thesis of Johannes Leupold at TU Darmstadt
 
 The preliminary structure, together with projected page counts is listed below.
 
-## Structure (27-29 p.)
+## Structure (24-27 p.)
 
 ### 1. Introduction (2 p.)
 
 * The overall setting and relevance of WF research
+* Motivation for considering Gaussian Padding
 
-### 2. Website Fingerprinting and Defenses (6 - 7 p.)
+### 2. Background Material (4 - 5 p.)
 
 #### 2.1. Theoretical Setting (2 p.)
 
 * Packet Traces
 * Threat Model
+* Attacks (ML techniques)
 * Defenses (deterministic, randomized, morphing)
 
 #### 2.2. Gaussian Padding (0.5 - 1 p.)
 
-* The definition of gaussian padding, the reason to consider it in the WF setting
+* The definition of gaussian padding
 
-#### 2.3. Related Work (3.5 - 4 p.)
+#### 2.3. Security Bound Estimation [Cherubin] (1 - 1.5 p)
+
+* How are security bounds estimated? What is the rationale behind it?
+
+#### 3. Prior Work (3 - 4 p.)
 
 * Early Attacks (Liberatore & Levine, Herrmann et al.)
 * More Sophisticated Attacks (Panchenko, Dyer)
@@ -30,19 +36,15 @@ The preliminary structure, together with projected page counts is listed below.
 * Morphing Defenses (Traffic Morphing, BuFLO, Tamaraw)
 * Security Bound Estimation (Cherubin)
 
-### 3. Experimental Methodology (5 - 6 p.)
+### 4. Experimental Methodology (5 - 6 p.)
 
-#### 3.1. A Generic Framework (1.5- 2 p.)
+#### 4.1. Data (1 - 2 p.)
 
-* Why?
-* Design choices and priorities
-* Library choices (scikit-learn, ...)
+* The Liberatore dataset
+* Poor quality of the Liberatore dataset
+* Preprocessing steps to improve data quality
 
-#### 3.2. Dataset Quality (0.5 - 1 p.)
-
-* Poor quality of the Liberatore dataset and measures taken to improve the used data
-
-#### 3.3. The Evaluation Pipeline (1.5 p.)
+#### 4.2. Evaluating Attack Performance (2 p.)
 
 * Pipeline structure
   * Dataset
@@ -51,19 +53,22 @@ The preliminary structure, together with projected page counts is listed below.
   * Attack (Classifier)
 * Parameterization
 
-#### 3.4. Error Bound Estimation (1.5 p.)
+#### 4.3. Error Bound Estimation (2 p.)
 
-### 4. Results (6 p.)
+* Pipeline structure
+* Parameterization
 
-#### 4.1. Performance of Gaussian Padding
+### 5. Results (7 p.)
+
+#### 5.1. Performance of Gaussian Padding
 
 * Performance against multiple attacks (as compared to no defense)
 * Performance compared with uniform padding, significant difference?
 
-#### 4.2. Security Bounds for Uniform Padding and Gaussian Padding
+#### 5.2. Security Bounds for Uniform Padding and Gaussian Padding
 
 * Lower classifier error bounds for both padding distributions wrt. some modern feature sets
 
-### 5. Discussion (6 p.)
+### 6. Discussion (2 p.)
 
-### 6. Conclusion (2 p.)
+### 6. Conclusion (1 p.)
