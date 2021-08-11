@@ -13,3 +13,6 @@
 *.toc
 *.xmpdata
 *.xmpi
+
+# JabRef backup file
+*.bib.bak

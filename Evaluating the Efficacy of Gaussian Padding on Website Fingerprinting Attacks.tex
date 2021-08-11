@@ -1,0 +1,151 @@
+\documentclass[
+	ruledheaders=chapter,
+	class=report,
+	thesis={type=master, department=inf},
+	accentcolor=1c,
+	custommargins=true,
+	marginpar=false,
+	parskip=half-,
+	fontsize=11pt,
+]{tudapub}
+
+\usepackage[ngerman,main=english]{babel}
+
+\usepackage[autostyle]{csquotes}
+\usepackage{microtype}
+
+\usepackage{enumerate}
+\usepackage{enumitem}
+
+\usepackage{biblatex}
+\bibliography{thesis-literature}
+
+\usepackage{tabularx}
+\usepackage{booktabs}
+
+\usepackage{mathtools}
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[export]{adjustbox}
+\usepackage[font=small,labelfont=bf]{caption}
+\graphicspath{ {./images/} }
+
+\counterwithout{footnote}{chapter}
+
+\pagenumbering{roman}
+
+\begin{document}
+	\Metadata{
+		title=Evaluating the Efficacy of Gaussian Padding on Website Fingerprinting Attacks,
+		author=Johannes Leupold
+	}
+	
+	\title{Evaluating the Efficacy of Gaussian Padding on Website Fingerprinting Attacks}
+	\author[J. Leupold]{Johannes Leupold}
+	\birthplace{Dresden}
+	\reviewer{Jean-Paul Degabriele \and Some Other Guy}
+
+	\department{inf}
+	\institute{IT Security}
+	\group{Cryptography and Network Security}
+	
+	\submissiondate{01.09.2021}
+	\examdate{20.09.2021}
+	
+	% Hinweis zur Lizenz:
+	% TUDa-CI verwendet momentan die Lizenz CC BY-NC-ND 2.0 DE als Voreinstellung.
+	% Die TU Darmstadt hat jedoch die Empfehlung von dieser auf die liberalere
+	% CC BY 4.0 geändert. Diese erlaubt eine Verwendung bearbeiteter Versionen und
+	% die kommerzielle Nutzung.
+	% TUDa-CI wird im nächsten größeren Release ebenfalls diese Anpassung vornehmen.
+	% Aus diesem Grund wird empfohlen die Lizenz manuell auszuwählen.
+	% \tuprints{urn=1234,printid=12345,doi=10.25534/tuprints-1234,license=cc-by-4.0}
+	% To see furhter information on the license option in English, remove the license= key and pay attention to the warning & help message.
+	
+	% \dedication{Für alle, die \TeX{} nutzen.}
+	
+	\maketitle
+	
+	\affidavit[digital]% oder \affidavit[digital] falls eine rein digitale Abgabe vorgesehen ist.
+
+	\begin{abstract}[english]
+		Abstract
+	\end{abstract}
+	
+	\tableofcontents
+	
+	\chapter{Introduction}
+	\label{introduction}
+	\IMRADlabel{introduction}
+	\pagenumbering{arabic}
+
+	This is the introduction.
+
+	\chapter{Background Material}
+	\label{fingerprinting}
+
+	\section{Theoretical Setting}
+	\label{theoretical}
+	
+	\subsection{Threat Model}
+	\label{theoretical:threat_model}
+	
+	\subsection{Attacks and Defenses}
+	\label{theoretical:attacks_and_defenses}
+	
+	\section{Gaussian Padding}
+	\label{gaussian_padding}
+	
+	\section{Security Bound Estimation according to Cherubin \cite{Cherubin2017}}
+	\label{cherubin_bounds}
+
+	\chapter{Prior Work}
+	\label{related}
+
+	\chapter{Experimental Methodology}
+	\label{methods}
+	\IMRADlabel{methods}
+
+	\section{Trace Data}
+	\label{dataset_quality}
+
+	\section{Evaluating Attack Performance}
+	\label{pipeline}
+
+	\section{Error Bound Estimation}
+	\label{error_bound_estimation}
+
+	\chapter{Results}
+	\label{results}
+	\IMRADlabel{results}
+
+	\section{Empirical Performance of Gaussian Padding}
+	\label{performance}
+
+	\section{Estimated Security Bounds}
+	\label{security_bounds}
+
+	\chapter{Discussion}
+	\label{discussion}
+	\IMRADlabel{discussion}
+
+	\chapter{Conclusion}
+	\label{conclusion}
+
+	\pagebreak
+	\pagenumbering{roman}
+	\setcounter{page}{5}
+	\addcontentsline{toc}{chapter}{Bibliography}
+	\printbibliography
+
+	\cleardoublepage
+	\phantomsection
+	\addcontentsline{toc}{chapter}{\listfigurename}
+	\listoffigures
+
+	\cleardoublepage
+	\phantomsection
+	\addcontentsline{toc}{chapter}{\listtablename}
+	\listoftables
+\end{document}
