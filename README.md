@@ -24,17 +24,23 @@ The preliminary structure, together with projected page counts is listed below.
 
 * The definition of gaussian padding
 
-#### 2.3. Security Bound Estimation according to Cherubin (1 - 1.5 p)
-
-* How are security bounds estimated? What is the rationale behind it?
-
 #### 3. Prior Work (3 - 4 p.)
+
+#### 3.1 Website Fingerprinting Attacks
 
 * Early Attacks (Liberatore & Levine, Herrmann et al.)
 * More Sophisticated Attacks (Panchenko, Dyer)
 * Modern Attacks (Wang et al., Panchenko et al., Hayes & Danezis)
+
+#### 3.2 Website Fingerprinting Countermeasures
+
+* Basic padding defenses
+* Noise
 * Morphing Defenses (Traffic Morphing, BuFLO, Tamaraw)
-* Security Bound Estimation (Cherubin)
+
+#### 3.3. Security Bound Estimation according to Cherubin (1 - 1.5 p)
+
+* How are security bounds estimated? What is the rationale behind it?
 
 ### 4. Experimental Methodology (5 - 6 p.)
 
