@@ -302,9 +302,12 @@
 	
 	\begin{equation}
 		\widehat{R}^* = \frac{L - 1}{L} \left(1 - \sqrt{1 - \frac{L}{L-1}\widehat{R}_{NN}}\right) \leq R^*
+		\label{eq:bayes_error_bound}
 	\end{equation}
 	
 	where $\widehat{R}_{NN}$ is the empirical error of the NN classifier on a data set containing $L = |\mathcal{C}|$ classes.
+	
+	% TODO Add information on epsilon-privacy
 
 	\chapter{Experimental Methodology}
 	\label{methods}
@@ -313,11 +316,164 @@
 	\section{Trace Data}
 	\label{methods:dataset}
 
+	In this work, the data set collected by Liberatore and Levine in \cite{Liberatore2006}, called the \textit{Liberatore data set} in the following, was used for all experiments\footnote{The traces are publicly available under \url{http://traces.cs.umass.edu/}}. The data set contains 2000 distinct web sites sampled from the university department's internet traffic and 205 traces per website. 
+	
+	Although Herrmann et al. \cite{Herrmann2009} also published a trace data set that was subsequently used in multiple publications (cf. \cite{Panchenko2011,Dyer2012}) and is considered to be of higher overall quality \cite{Dyer2012}, it was no longer accessible under the URL given in their paper, so it couldn't be used here. There were several preprocessing steps done to achieve better data quality. In the following sections, an overview of the main issues in the data set (Section \ref{methods:dataset:quality}) is given and the preprocessing (Section \ref{methods:dataset:pre}) is described.
+	
+	\subsection{Data Quality}
+	\label{methods:dataset:quality}
+	
+	Several issues have become apparent during the use of the Liberatore data set, which demanded careful preprocessing to clean as much inherently inconsistent data as possible. First of all, there were many traces that didn't contain a single packet in either direction. Some websites even didn't have a single trace that contained a packet. Furthermore, some traces only consisted of a single 52 byte packet, which corresponds to a single \texttt{ACK}. Such traces clearly don't represent a properly recorded page load and are thus counterproductive to the classification task that is website fingerprinting. According to Dyer et al. \cite{Dyer2012}, 13.8\% of the traces in the Liberatore data set are having 10 packets or less in both directions combined, which is highly improbable for most websites. An overview of other statistical properties of the data set is shown in Table \ref{tbl:dataset_props}.
+	
+	\begin{table}
+		\centering
+		\begin{tabularx}{0.7\textwidth}{|X|r|}
+			\hline Traces with 0 packets in one direction & 3.1\% \\
+			\hline Traces with $\leq 5$ bidirectional packets & 5.2\% \\
+			\hline Traces with $\leq 10$ bidirectional packets & 13.8\% \\
+			\hline Traces with $\leq 1\,\text{s}$ duration & 29.4\% \\
+			\hline Median trace duration & $2.4\,\text{s}$ \\
+			\hline Median bidirectional packet count & 106 \\
+			\hline Median overall bandwidth utilization & $78,382\,\text{byte}$ \\
+			\hline
+		\end{tabularx}
+		\caption{Statistical properties of the Liberatore dataset \cite{Liberatore2006}, taken from \cite{Dyer2012}}
+		\label{tbl:dataset_props}
+	\end{table} 
+	
+	Another irregularity that was observed came with the fact that some traces have an incoming packet as the first one recorded. This behavior is entirely unexpected in the context of loading a web page, as the client first needs to make a HTTP request before the server will send any data back.
+	
+	Furthermore, there were some clear outliers in the trace data that probably correspond to incomplete page loads. Such outliers may negatively affect classification accuracy. An example for such an outlier is shown in Table \ref{tbl:outlier}.
+	
+	\begin{table}
+		\centering
+		\begin{tabular}{|l||r|r||r|r|}
+			\hline \textbf{Site \#1156} & \multicolumn{2}{c||}{\textbf{Incoming}} & \multicolumn{2}{c|}{\textbf{Outgoing}} \\
+			 \hline\textbf{Trace ID} & \textbf{Bandwidth} & \textbf{Packets} & \textbf{Bandwidth} & \textbf{Packets} \\
+			\hline 65 & $68,052\,\text{byte}$ & 81 & $8,140\,\text{byte}$ & 19 \\
+			\hline 66 & $68,256\,\text{byte}$ & 84 & $8,140\,\text{byte}$ & 19 \\
+			\hline 67 & $5,968\,\text{byte}$ & 8 & $1,312\,\text{byte}$ & 4 \\
+			\hline 68 & $67,724\,\text{byte}$ & 75 & $8,596\,\text{byte}$ & 17 \\
+			\hline 69 & $67,880\,\text{byte}$ & 78 & $8,140\,\text{byte}$ & 19 \\
+			\hline
+		\end{tabular}
+		\caption[An outlier in trace data]{An outlier in trace data. Data for web page \#1156 is shown with traces \#65-\#69. Trace \#67 clearly deviates from the majority of other traces. For the data shown, \texttt{ACK} packets (all packets sized $52\,\text{byte}$) were filtered.}
+		\label{tbl:outlier}
+	\end{table}
+
+	\subsection{Preprocessing}
+	\label{methods:dataset:pre}
+	
+	To eliminate as much anomalies as possible before running evaluations on the data, it was analyzed thoroughly using outlier detection to filter out pages with a high fraction of degenerate traces as described in the previous section. Three separate outlier detection methods have been combined to form an ensemble outlier detector, which serves to draw conclusions on possible outliers with a higher certainty than when using only a single detection method. Prior to outlier detection, simple \texttt{ACK} packets (all packets sized $52\,\text{byte}$) were filtered from all traces to reduce noise and focus on actual payload transmitted over the network. Then, traces were aggregated to obtain the utilized bandwidth and packet count in either direction, which yields four dimensions per trace. For outlier detection, three detectors implemented in the \texttt{scikit-learn}\footnote{\url{https://scikit-learn.org/}} package \cite{Pedregosa2011} were used, namely the \texttt{EllipticEnvelope}, \texttt{LocalOutlierFactor} and \texttt{IsolationForest} algorithms\footnote{For details on the algorithms, please refer to \url{https://scikit-learn.org/stable/modules/outlier_detection.html}}. The output of these detectors is either 1 or -1, marking an inlier or outlier, respectively. Let $o_{env}, o_{lof}, o_{ilf} \in \{-1, 1\}$ be the output of the three detectors. Then, an outlier score $o$ can be defined as
+	
+	\begin{align*}
+		o &= o_{env} +  o_{lof} + o_{ilf}
+		\intertext{$o$ can only take values $\{-3, -1, 1, 3\}$, which is then mapped to the outlier decision $o^*$ as follows}
+		o^* &= \begin{cases}
+			\text{inlier}, &o = 3,\\
+			\text{probable inlier}, &o = 1,\\
+			\text{probable outlier}, &o = -1,\\
+			\text{outlier}, &o = -3.
+		\end{cases}
+	\end{align*}
+
+	This evaluation leads to the conclusion that roughly 11.9\% of the traces in the data set are outliers or probable outliers with respect to the previous detection method. The distribution of the count of traces per website for which $o^* \in \{\text{outlier}, \text{probable outlier}\}$ has the properties shown in Table \ref{tbl:outlier_dist}.
+	
+	\begin{table}
+		\centering
+		\begin{tabular}{|l|r|}
+			\hline Mean & 24.32 \\
+			\hline Standard Deviation & 8.80 \\
+			\hline Minimum & 0\\
+			\hline 25\% Percentile & 19 \\
+			\hline Median & 24 \\
+			\hline 75\% Percentile & 29 \\
+			\hline Maximum & 63\\
+			\hline
+		\end{tabular}
+		\caption{The distribution of outlier or probable outlier count per website}
+		\label{tbl:outlier_dist}
+	\end{table}
+
+	After analyzing the outlier traces, the data set was filtered using two criteria:
+	
+	\begin{enumerate}
+		\item Drop all websites having 29 or more outlier traces, thus keeping the 75\% percentile of the data in regard to outlier count.
+		\item From the remaining websites drop all that have at least one trace with three or fewer packets in both directions. Traces that have three or fewer packets in one direction, but more than three in the other one are not considered.
+	\end{enumerate}
+
+	After these preprocessing steps, 532 websites out of the initial 2000 remain in the data set.
+
 	\section{Evaluating Attack Performance}
 	\label{pipeline}
+	
+	Attacks and defenses were evaluated against each other using a generic framework implementing a general-purpose evaluation pipeline implemented in the course of this thesis. The pipeline consists of four stages, which are briefly described in the following sections. All implementations were done in Python 3.8 using the \texttt{scikit-learn} machine learning toolkit \cite{Pedregosa2011}, as well as the \texttt{numpy}\footnote{\url{https://numpy.org/}} \cite{Harris2020} and \texttt{scipy}\footnote{\url{https://www.scipy.org/}} \cite{Virtanen2020} libraries for scientific computing and \texttt{pandas}\footnote{\url{https://pandas.pydata.org/}} \cite{McKinney2010,Reback2021} for data manipulation and I/O. APIs have been modeled after the example of \texttt{scikit-learn} \cite{Buitinck2013} where possible.
+	
+	An instance of the pipeline is always ran with a set of training and a set of test data, which are distinct. It may run multiple evaluations for different attacks and defenses in parallel, for which the \texttt{multiprocessing} module from Python's standard library is utilized. The number of training and test examples to use for evaluation as well as the offset between training and test data can be customized. For all experiments, the offset between training and test data was set to 0, i.e. both sets are read from a single contiguous range of trace IDs. The first trace id of this set was randomized. Varying numbers of training examples had to be used, following the previous author's suggestions. See Table \ref{tbl:train} for the exact numbers. The number of test examples per website was always set to be 4. For every pair of defense and attack, the evaluation was run 10 times.
+	
+	\begin{table}
+		\centering
+		\begin{tabular}{|l|r|}
+			\hline \textbf{Attack} & \textbf{Training Examples} \\
+			\hline LL \cite{Liberatore2006} & 4 \\
+			\hline H \cite{Herrmann2009} & 4 \\
+			\hline P \cite{Panchenko2011} & 18\\
+			\hline VNG++ \cite{Dyer2012} & 16*\\
+			% TODO Add CUMUL if I find time to do the eval
+			\hline
+		\end{tabular}
+		\caption[The number of training examples used for each attack]{The number of training examples used for each attack\\{*} = For VNG++, Dyer et al. did not specify the number they used in their publication, therefore the default setting from their published source code was used.}
+		\label{tbl:train}
+	\end{table}
+	
+	\subsection{Data Set}
+	
+	The data set stage takes care of loading traces and abstracts from the storage technology used for the data set. It mainly consists of an implementation of the abstract class \texttt{Dataset} encapsulating all logic required to load a dataset and transform it into a \texttt{pandas} data frame with the following columns, where each row corresponds to a recorded packet:
+	
+	\begin{itemize}
+		\item \texttt{site\_id}: The ID of the website, must be unique within the data set
+		\item \texttt{trace\_id}: The ID of the packet trace, must be unique within the same website
+		\item \texttt{collection\_time}: The time at which the trace collection started
+		\item \texttt{time}: The offset of the packet's arrival from the first packet in the trace in milliseconds
+		\item \texttt{size}: The length of the packet, negative for outgoing packets and positive for incoming packets
+	\end{itemize}
+
+	An implementation is provided for the Liberatore dataset, containing additional functionality to download, extract and parse the PCAP logs of the data set and store them in the HDF5 format for quick and easy access.
+	
+	\subsection{Defense}
+	
+	After the data set follows the optional defense stage, which is only present when attacks should be evaluated against defenses. This stage is implemented using the \texttt{Defense} class, which takes packet traces in the format as returned by \texttt{Dataset} and returns the same data structure. Defenses normally change the \texttt{size} and/or \texttt{time} columns of a trace.
+	
+	Implementations of all padding defenses mentioned in Section \ref{prior:defenses} are provided, as well as Gaussian padding in packet-random and session-random mode.
+	
+	\subsection{Feature Extraction}
+	
+	In the feature extraction stage, packet traces are transformed to a single vector of features and a class label (the \texttt{site\_id}). The output of this stage is no longer expected to be a \texttt{pandas} dataframe, but a pair of \texttt{numpy} arrays, the first containing all feature values and the second containing the class labels.
+	
+	Individual feature sets can be combined using the features from both sets and transformed, using any \texttt{scikit-learn} transformer, as done with the TF transformation and cosine normalization in the attack by Herrmann et al. \cite{Herrmann2009}.
+	
+	The framework created during this thesis provides implementations for the feature sets of Liberatore and Levine \cite{Liberatore2006}, Herrmann et al. \cite{Herrmann2009}, Panchenko et al. \cite{Panchenko2011, Panchenko2016} and Dyer et al. \cite{Dyer2012}. Most operations have been implemented solely as \texttt{numpy} array operations and \texttt{pandas} aggregations due to the superior speed because of them running in native C code \cite{Harris2020,McKinney2010}.
+	
+	\subsection{Classifier}
+	
+	The final stage of the pipeline is a classifier which is trained using the features and class labels extracted from the training data. Then, the test data's features are classified with the trained classifier and the chosen performance measure is calculated using the predicted classes against the actual class labels. The default and most common choice for said performance measure is accuracy (the fraction of correctly classified examples).
+	
+	All classification algorithms have been implemented using \texttt{scikit-learn}. For Multinomial Naive Bayes and SVM the implementations provided by the library were used. Unfortunately, it doesn't contain an implementation of Naive Bayes using Kernel Density Estimation, so that variant was implemented following \texttt{scikit-learn}'s typical API design \cite{Buitinck2013}. Also, an efficient variant of one-dimensional KDE was implemented following the algorithm from the WEKA Java machine learning toolkit\footnote{\url{https://www.cs.waikato.ac.nz/ml/weka/}} \cite{Frank2016}, which was used by most prior publications that were using the NB classifier with KDE (cf. \cite{Liberatore2006,Dyer2012}).
 
 	\section{Error Bound Estimation}
 	\label{error_bound_estimation}
+
+	When estimating lower bounds for classifier error according to the method developed by Cherubin \cite{Cherubin2017}, the general flow and pipeline structure resembles closely the one described in the previous section. However, as the final stage of the pipeline, the attack's classifier is substituted by Cherubin's error estimator. Also, there are no distinct training and test sets in this pipeline as the estimator calculates the accuracy of the NN classifier using 5-fold cross validation (CV). In this method, the data set is split up into five equal parts, of which each one serves as the test set once while the other four become the training set. After measuring the classification accuracy for all five runs, the results are averaged to obtain a final score.
+	
+	For this evaluation, 100 websites were used with 100 traces each which were loaded from a contiguous range of trace IDs. The first trace ID of the data set was randomized. The experiment was repeated 50 times for both, the closed-world and open-world mode (see below).
+	
+	\subsection{Bayes Error Estimator}
+	
+	The Bayes error estimator operates either in closed-world or open-world mode. In closed-world, the data set received is directly split up for cross validation and accuracy is measured using all websites and traces. In contrast, when using the open-world mode, for each website present in the data, all traces of that website and exactly as many randomly selected traces of different websites are passed on to the cross validation. This corresponds to the One-vs-All mode described by Cherubin \cite{Cherubin2017}, in which the monitoring of a single website against all others is simulated.
+	
+	After calculating the CV accuracy, the formula from Equation \ref{eq:bayes_error_bound} is used to calculate $\widehat{R}^*$ as the lower bound of the Bayes error.
+	
+	% TODO Add epsilon calculation
 
 	\chapter{Results}
 	\label{results}
