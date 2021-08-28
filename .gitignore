@@ -9,7 +9,7 @@
 *.lot
 *.out
 *.run.xml
-*.synctex.gz
+*.synctex*
 *.toc
 *.xmpdata
 *.xmpi
