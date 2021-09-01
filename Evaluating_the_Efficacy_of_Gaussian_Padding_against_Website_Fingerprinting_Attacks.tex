@@ -46,11 +46,11 @@
 
 \begin{document}
 	\Metadata{
-		title=Evaluating the Efficacy of Gaussian Padding on Website Fingerprinting Attacks,
+		title=Evaluating the Efficacy of Gaussian Padding against Website Fingerprinting Attacks,
 		author=Johannes Leupold
 	}
 	
-	\title{Evaluating the Efficacy of Gaussian Padding on Website Fingerprinting Attacks}
+	\title{Evaluating the Efficacy of Gaussian Padding against Website Fingerprinting Attacks}
 	\author[J. Leupold]{Johannes Leupold}
 	\birthplace{Dresden}
 	\reviewer{Jean-Paul Degabriele \and Vukasin Karadzic}
@@ -59,7 +59,7 @@
 	\institute{IT Security}
 	\group{Cryptography and Network Security}
 	
-	\submissiondate{01.09.2021}
+	\submissiondate{20.09.2021}
 	\examdate{20.09.2021}
 	
 	% Hinweis zur Lizenz:
@@ -69,17 +69,15 @@
 	% die kommerzielle Nutzung.
 	% TUDa-CI wird im nächsten größeren Release ebenfalls diese Anpassung vornehmen.
 	% Aus diesem Grund wird empfohlen die Lizenz manuell auszuwählen.
-	% \tuprints{urn=1234,printid=12345,doi=10.25534/tuprints-1234,license=cc-by-4.0}
+%	\tuprints{urn=1234,printid=12345,doi=10.25534/tuprints-1234,license=cc-by-4.0}
 	% To see furhter information on the license option in English, remove the license= key and pay attention to the warning & help message.
-	
-	% \dedication{Für alle, die \TeX{} nutzen.}
 	
 	\maketitle
 	
-	\affidavit[digital]% oder \affidavit[digital] falls eine rein digitale Abgabe vorgesehen ist.
+	\affidavit[digital]
 
 	\begin{abstract}[english]
-		Website Fingerprinting (WF) attacks pose a serious threat to internet users' privacy, being effective against popular anonymization services such as Tor. For this reason, various countermeasures against WF have been considered. A major class of such countermeasures are padding schemes, out of which randomized schemes have previously shown to achieve good results with a high bandwidth efficiency. Up to now, only uniformly distributed padding lengths have been examined. This thesis contributes a comprehensive study of padding using the Gaussian distribution, evaluating it against a selection of WF attacks and estimating a formal bound on the efficacy of this scheme. It shows that the Gaussian distribution achieves better results against certain attacks than the uniform distribution. However, it is also revealed that Gaussian padding is insufficient to defend against recent WF attacks. In particular, the results point out that simple randomized padding schemes are unlikely to reliably disguise coarse-grained properties of websites, and therefore aren't sufficient on their own to defend against attacks using those properties.
+		Website Fingerprinting (WF) attacks pose a serious threat to internet users' privacy, being effective against popular anonymization services such as Tor. For this reason, various countermeasures against WF have been considered. A major class of such countermeasures are padding schemes, out of which randomized schemes have previously shown to achieve good results with a high bandwidth efficiency. So far, only uniformly distributed padding lengths have been examined. This thesis contributes a comprehensive study of padding using the Gaussian distribution, evaluating it against a selection of WF attacks and estimating a formal bound on the efficacy of this scheme. It shows that the Gaussian distribution achieves better results against certain attacks than the uniform distribution. However, it is also revealed that Gaussian padding is insufficient to defend against recent WF attacks. In particular, the results point out that simple randomized padding schemes are unlikely to reliably disguise coarse-grained properties of websites, and therefore aren't sufficient on their own to defend against attacks using those properties.
 	\end{abstract}
 	
 	\tableofcontents
@@ -89,7 +87,7 @@
 	\IMRADlabel{introduction}
 	\pagenumbering{arabic}
 
-	Preserving privacy while surfing the internet has become an increasingly sensitive topic over the last two decades. The web keeps extending into every day life, while at the same time, the emergence of actors interested in gaining insights into the browsing behavior of individuals raises concerns about the loss of privacy. On the one hand, there are large internet companies trying to gain information about a user's interests for the sake of profit. While this may be undesirable and possibly reprehensible from a data protection standpoint, the certainly more concerning development is the presence of nation-state adversaries that are collecting data on citizens for mass surveillance, state censorship or even the criminal prosecution of dissidents. For this reason, SSH or VPN tunnels and anonymization services such as Tor\footnote{\url{https://www.torproject.org/}} have experienced a steady climb in popularity, especially after relevant events, such as the Snowden revelations in 2013 \cite{TorHistory}.
+	Preserving privacy while surfing the internet has become an increasingly sensitive topic over the last two decades. The web keeps extending into everyday life, while at the same time, the emergence of actors interested in gaining insights into the browsing behavior of individuals raises concerns about the loss of privacy. On the one hand, there are large internet companies trying to gain information about a user's interests for the sake of profit. While this may be undesirable and possibly reprehensible from a data protection standpoint, the certainly more concerning development is the presence of nation-state adversaries that are collecting data on citizens for mass surveillance, state censorship or even the criminal prosecution of dissidents. For this reason, SSH or VPN tunnels and anonymization services such as Tor\footnote{\url{https://www.torproject.org/}} have experienced a steady climb in popularity, especially after relevant events, such as the Snowden revelations in 2013 \cite{TorHistory}.
 	
 	Unfortunately, Website Fingerprinting (WF) research has shown that it is not only possible to identify which websites a user has visited from the raw network packet sizes, but to do so with high accuracy and robustness (cf. \cite{Liberatore2006,Herrmann2009,Panchenko2011,Dyer2012,Wang2014,Panchenko2016,Hayes2016,Sirinam2018,Wang2021}). This fact has led to the development of various countermeasures (cf. \cite{Wright2009,Dyer2012,Cai2014,Cai2014a,Juarez2016,Luo2021}) that try to disguise the identifying characteristics of a website in the packet sizes. In particular, those defenses may change packet sizes or timing in an attempt to make it harder to distinguish individual websites or to make one website look like another. A major class of such defenses are padding schemes that increase packet sizes after some fixed algorithm. Padding sizes can be chosen deterministically or randomized, while the latter have shown to achieve better results at a higher bandwidth efficiency \cite{Dyer2012}. However, up to now only the uniform distribution has been considered to select padding sizes.
 	
@@ -394,7 +392,7 @@
 	\subsection{Preprocessing}
 	\label{methods:dataset:pre}
 	
-	To eliminate as much anomalies as possible before running evaluations on the data, it was analyzed thoroughly using outlier detection to filter out pages with a high fraction of degenerate traces as described in the previous section. Three separate outlier detection methods have been combined to form an ensemble outlier detector, which serves to draw conclusions on possible outliers with a higher certainty than when using only a single detection method. Prior to outlier detection, simple \texttt{ACK} packets (all packets sized $52\,\text{byte}$) were filtered from all traces to reduce noise and focus on actual payload transmitted over the network. Then, traces were aggregated to obtain the utilized bandwidth and packet count in either direction, which yields four dimensions per trace. For outlier detection, three detectors implemented in the \texttt{scikit-learn}\footnote{\url{https://scikit-learn.org/}} package \cite{Pedregosa2011} were used, namely the \texttt{EllipticEnvelope}, \texttt{LocalOutlierFactor} and \texttt{IsolationForest} algorithms\footnote{For details on the algorithms, please refer to \url{https://scikit-learn.org/stable/modules/outlier_detection.html}}. The output of these detectors is either 1 or -1, marking an inlier or outlier, respectively. Let $o_{env}, o_{lof}, o_{ilf} \in \{-1, 1\}$ be the output of the three detectors. Then, an outlier score $o$ can be defined as
+	To eliminate as many anomalies as possible before running evaluations on the data, it was analyzed thoroughly using outlier detection to filter out pages with a high fraction of degenerate traces as described in the previous section. Three separate outlier detection methods have been combined to form an ensemble outlier detector, which serves to draw conclusions on possible outliers with a higher certainty than using only a single detection method. Prior to outlier detection, simple \texttt{ACK} packets (all packets sized $52\,\text{byte}$) were filtered from all traces to reduce noise and focus on actual payload transmitted over the network. Then, traces were aggregated to obtain the utilized bandwidth and packet count in either direction, which yields four dimensions per trace. For outlier detection, three detectors implemented in the \texttt{scikit-learn}\footnote{\url{https://scikit-learn.org/}} package \cite{Pedregosa2011} were used, namely the \texttt{EllipticEnvelope}, \texttt{LocalOutlierFactor} and \texttt{IsolationForest} algorithms\footnote{For details on the algorithms, please refer to \url{https://scikit-learn.org/stable/modules/outlier_detection.html}}. The output of these detectors is either 1 or -1, marking an inlier or outlier, respectively. Let $o_{env}, o_{lof}, o_{ilf} \in \{-1, 1\}$ be the output of the three detectors. Then, an outlier score $o$ can be defined as
 	
 	\begin{align*}
 		o &= o_{env} +  o_{lof} + o_{ilf}
@@ -433,14 +431,14 @@
 		\item From the remaining websites drop all that have at least one trace with three or fewer packets in both directions. Traces that have three or fewer packets in one direction, but more than three in the other one are not considered.
 	\end{enumerate}
 
-	After these preprocessing steps, 532 websites out of the initial 2000 remain in the data set. The changed outlier characteristics can be viewed in Table \ref{tbl:outlier_dist}. The mean number of outliers or probably outliers per website went down to 20.61 from 24.32, thus lowering the outlier rate to 10.1\%. Note that many of the websites with low outlier count were degenerate with respect to the packet count filter, in the sense that the majority of their traces had zero or only one packet, which is the reason why the average outlier count couldn't be lowered more significantly. Nonetheless, the outlier characteristics were clearly improved through preprocessing.
+	After these preprocessing steps, 532 websites out of the initial 2000 remain in the data set. The changed outlier characteristics can be viewed in Table \ref{tbl:outlier_dist}. The mean number of outliers or probable outliers per website went down to 20.61 from 24.32, thus lowering the outlier rate to 10.1\%. Note that many of the websites with low outlier count were degenerate with respect to the packet count filter, in the sense that the majority of their traces had zero or only one packet, which is the reason why the average outlier count couldn't be lowered more significantly. Nonetheless, the outlier characteristics were clearly improved through preprocessing.
 
 	\section{Evaluating Attack Performance}
 	\label{pipeline}
 	
 	Attacks and defenses were evaluated against each other using a generic framework implemented in the course of this thesis, which provides a generic evaluation pipeline. It consists of four stages, which are briefly described in the following sections. All implementations were done in Python 3.8 using the \texttt{scikit-learn} machine learning toolkit \cite{Pedregosa2011}, as well as the \texttt{numpy}\footnote{\url{https://numpy.org/}} \cite{Harris2020} and \texttt{scipy}\footnote{\url{https://www.scipy.org/}} \cite{Virtanen2020} libraries for scientific computing and \texttt{pandas}\footnote{\url{https://pandas.pydata.org/}} \cite{McKinney2010,Reback2021} for data manipulation and I/O. APIs have been modeled after the example of \texttt{scikit-learn} \cite{Buitinck2013} where possible.
 	
-	An instance of the pipeline is always ran with a set of training and a set of test data, which are distinct. It may run multiple evaluations for different attacks and defenses in parallel, for which the \texttt{multiprocessing} module from Python's standard library is utilized. The number of training and test examples to use for evaluation as well as the offset between training and test data can be customized. For all experiments, the offset between training and test data was set to 0, i.e. both sets are read from a single contiguous range of trace IDs. The first trace id of this set was randomized. Varying numbers of training examples had to be used, following the previous author's suggestions. See Table \ref{tbl:train} for the exact numbers. The number of test examples per website was always set to be 4.
+	An instance of the pipeline is always run with a set of training and a set of test data, which are distinct. It may run multiple evaluations for different attacks and defenses in parallel, for which the \texttt{multiprocessing} module from Python's standard library is utilized. The number of training and test examples to use for evaluation as well as the offset between training and test data can be customized. For all experiments, the offset between training and test data was set to 0, i.e. both sets are read from a single contiguous range of trace IDs. The first trace id of this set was randomized. Varying numbers of training examples had to be used, following the previous author's suggestions. See Table \ref{tbl:train} for the exact numbers. The number of test examples per website was always set to be 4.
 	
 	\begin{table}
 		\centering
@@ -521,13 +519,13 @@
 	\section{Empirical Performance of Gaussian Padding}
 	\label{performance}
 	
-	Figures \ref{fig:ll}, \ref{fig:h}, \ref{fig:p} and \ref{fig:vng++} display the performance of the LL, H, P and VNG++ attacks against the random padding defenses, respectively. One major thing to notice is that Gaussian padding works particularly well against the LL and H attacks, while it largely fails to thwart the attacks against P and VNG++. Especially the VNG++ classifier is robust against both randomized padding schemes, as it experiences the smallest drop in accuracy, only about 5\% at $n = 512$. In contrast, the accuracy of the P classifier drops by approximately 25\% for both session random schemes, but still achieves an accuracy of 60\%. Much differently, the LL and H attacks only manage under 5\% of accuracy against the best defense at $n = 400$.
+	Figures \ref{fig:ll}, \ref{fig:h}, \ref{fig:p}, \ref{fig:vng++} and \ref{fig:cumul} display the performance of the LL, H, P, VNG++ and CUMUL attacks against the random padding defenses, respectively. One major thing to notice is that Gaussian padding works particularly well against the LL and H attacks, while it largely fails to sufficiently thwart the attacks against P, VNG++ and CUMUL. Especially the VNG++ and CUMUL classifiers are robust against both randomized padding schemes, as they experience the smallest drop in accuracy, only at most 10\% at $n = 512$. In contrast, the accuracy of the P classifier drops by approximately 25\% for both session random schemes, but still achieves an accuracy of 60\%. Much differently, the LL and H attacks only manage under 5\% of accuracy against the best defense at $n = 512$. The CUMUL attack reaches the highest accuracy against the best defense at that point, still classifying 75\% of traces correctly, which is only 3\% less than without a defense.
 	
-	A second notable thing is the difference between packet random and session random padding schemes. For all attacks that have been evaluated, session random padding performs considerably better. Against the P attack this difference is particularly large, reaching close to 10\% difference in accuracy. That said, the efficiency gap is smaller for all other attacks, although still noticeable. VNG++ has the 
+	A second notable thing is the difference between packet random and session random padding schemes. For all attacks that have been evaluated, except CUMUL, session random padding performs considerably better. Against the P attack this difference is particularly large, reaching slightly over 10\% difference in accuracy. That said, the efficiency gap is smaller for all other attacks, although still noticeable. CUMUL, however, shows virtually no difference between session random and packet random padding, both leading to equal average accuracy.
 	
-	When comparing Gaussian padding with uniform padding, it stands out that for some attacks there's a clear advantage of Gaussian padding over the uniform variant, while for others, they seem to perform almost equally or with a slight advantage for uniform padding. Considering the P attack, the padding distributions can only hardly be distinguished, yielding almost identical performance in both, the packet random and session random schemes. On the other hand, against the LL and H attacks, Gaussian padding clearly performs better up to a difference of more than 5\% in classifier accuracy for the session random scheme. Finally, in the VNG++ attack, uniform and Gaussian padding are exhibiting very similar performance, with a perceived small advantage for uniform padding.
+	When comparing Gaussian padding with uniform padding, it stands out that for some attacks there's a clear advantage of Gaussian padding over the uniform variant, while for others, they seem to perform almost equally or with a slight advantage for uniform padding. Considering the P attack, the padding distributions can only hardly be distinguished, yielding almost identical performance in both, the packet random and session random schemes. The same goes for CUMUL, where the maximum difference between both padding distributions is less than 1\%. On the other hand, against the LL and H attacks, Gaussian padding clearly performs better up to a difference of more than 5\% in classifier accuracy for the session random scheme. Finally, in the VNG++ attack, uniform and Gaussian padding are exhibiting very similar performance, with a perceived small advantage for uniform padding.
 
-	\begin{figure}
+	\begin{figure}[tbp]
 		\begin{subfigure}{0.495\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{plots/performance_ll_pkt.png}
@@ -542,7 +540,7 @@
 		\caption[Performance of Gaussian padding against the LL attack]{Performance of Gaussian padding against the LL attack \cite{Liberatore2006} in comparison to uniform padding.}
 		\label{fig:ll}
 	\end{figure}
-	\begin{figure}
+	\begin{figure}[tbp]
 		\begin{subfigure}{0.495\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{plots/performance_h_pkt.png}
@@ -557,7 +555,7 @@
 		\caption[Performance of Gaussian padding against the H attack]{Performance of Gaussian padding against the H attack \cite{Herrmann2009} in comparison to uniform padding.}
 		\label{fig:h}
 	\end{figure}
-	\begin{figure}
+	\begin{figure}[tbp]
 		\begin{subfigure}{0.495\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{plots/performance_p_pkt.png}
@@ -572,7 +570,7 @@
 		\caption[Performance of Gaussian padding against the P attack]{Performance of Gaussian padding against the P attack \cite{Panchenko2011} in comparison to uniform padding.}
 		\label{fig:p}
 	\end{figure}
-	\begin{figure}
+	\begin{figure}[tbp]
 		\begin{subfigure}{0.495\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{plots/performance_vng++_pkt.png}
@@ -587,7 +585,21 @@
 		\caption[Performance of Gaussian padding against the VNG++ attack]{Performance of Gaussian padding against the VNG++ attack \cite{Dyer2012} in comparison to uniform padding.}
 		\label{fig:vng++}
 	\end{figure}
-	% TODO Add CUMUL
+	\begin{figure}[tbp]
+		\begin{subfigure}{0.495\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{plots/performance_cumul_pkt.png}
+			\caption{Packet Random Padding}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.495\textwidth}
+			\centering
+			\includegraphics[width=\textwidth]{plots/performance_cumul_ses.png}
+			\caption{Session Random Padding}
+		\end{subfigure}
+		\caption[Performance of Gaussian padding against the CUMUL attack]{Performance of Gaussian padding against the CUMUL attack \cite{Panchenko2016} in comparison to uniform padding.}
+		\label{fig:cumul}
+	\end{figure}
 
 	\subsection{Bandwidth Overhead}
 	
@@ -609,7 +621,7 @@
 		\label{tbl:overhead}
 	\end{table}
 
-	\begin{figure}
+	\begin{figure}[tb]
 		\centering
 		\includegraphics[width=\textwidth]{plots/overhead.png}
 		\caption[Bandwidth overhead of uniform and Gaussian padding in the packet random and session random schemes]{Bandwidth overhead of uniform and Gaussian padding in the packet random and session random schemes. The mean is marked as a dashed line.}
@@ -621,9 +633,9 @@
 	
 	To calculate the significance of the previously mentioned observations, the results from the second experiment were used. For each pair of attack and defense, the classification accuracy was measured 50 times. Figure \ref{fig:performance_dist} displays a distribution plot of the results. Subsequently, the measured accuracy values were used to conduct a paired t-test on the differences of the average accuracy for uniform and Gaussian padding. The null hypothesis was that the actual means of the classifier accuracy were equal for uniform and Gaussian padding. Table \ref{tbl:sig_score} shows the results of the test.
 	
-	Overall, the Gaussian padding methods perform significantly better than uniform padding for a significance level of 99\% against both, the LL and H attacks. In contrast, for the VNG++ and CUMUL attacks in the packet-random scheme, uniform padding performs significantly better than Gaussian padding for the same significance level. The P attack yields no significant difference against the packet-random scheme, while the same goes for the CUMUL attack against the session-random scheme with a significance level of 99\%. However, when lowering the significance level to 95\%, uniform padding performs significantly better than Gaussian padding against the CUMUL attack. Using the session random scheme against the P and VNG++ attack, uniform padding performs significantly better than Gaussian padding.
+	Overall, the Gaussian padding methods perform significantly better than uniform padding for a significance level of 99\% against both, the LL and H attacks. In contrast, for the VNG++ attack, uniform padding performs significantly better than Gaussian padding for the same significance level. The same goes for the P attack in the packet random and the CUMUL attack in the session random scheme. However, while the differences of average performance are rather large in LL and H (between 4\% and 7.5\%), this isn't the case for the other attacks, where the maximum average difference between uniform and Gaussian padding is less than 3\%, which is reached by VNG++ in the session random scheme. For all other combinations, uniform padding performs less than 1\% better. For CUMUL in the packet random scheme and P against session random, this difference is not significant.
 		
-	\begin{figure}
+	\begin{figure}[tb]
 		\begin{subfigure}{0.495\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{plots/significance_pkt.png}
@@ -642,36 +654,34 @@
 	\begin{table}
 		\centering
 		\small
-		% TODO Add new performance values
 		\begin{tabular}{llcccc}
 			\toprule \textbf{Attack} & \textbf{Scheme} & $\mathbf{\mu^*_{u}}$ \textbf{(\%)} & $\mathbf{\mu^*_{g}}$  \textbf{(\%)} & $\mathbf{t}$ & $\mathbf{\alpha}$ \\
-			\midrule LL & Packet & $23.39 \pm 2.71$ & $\mathbf{18.54 \pm 2.73}$ & $15.95$ & $0.000$\\
-			 & Session & $13.44 \pm 1.74$ & $\mathbf{6.15 \pm 1.19}$ & $27.19$ &  $0.000$\\ \addlinespace
-			H & Packet & $14.75 \pm 2.54$ & $\mathbf{6.75 \pm 1.81}$ & $30.52$ & $0.000$ \\
-			& Session & $7.26 \pm 1.42$ & $\mathbf{2.83 \pm 0.83}$ & $19.49$ & $0.000$ \\ \addlinespace
-			P & Packet & $80.67 \pm 3.19$ & $80.86 \pm 3.07$ & $-0.98$ & $0.833$ \\
-			& Session & $\mathbf{73.05 \pm 3.54}$ & $73.83 \pm 3.57$ & $-2.69$ & $0.995$ \\ \addlinespace
-			VNG++ & Packet & $\mathbf{80.06 \pm 2.99}$ & $80.98 \pm 2.84$ & $-3.97$ & $1.000$ \\
-			& Session & $\mathbf{75.52 \pm 3.18}$ & $78.23 \pm 3.20$ & $-11.18$ & $1.000$ \\ \addlinespace
-			CUMUL & Packet & $\mathbf{83.83\pm 2.82}$ & $84.38 \pm 2.67$ & $-4.72$ & $1.000$\\
-			& Session & $83.53 \pm 2.94$ & $83.91 \pm 2.85$ & $-2.63$ & $0.994$ \\
+			\midrule LL & Packet & $22.97 \pm 2.32$ & $\mathbf{18.49 \pm 2.45}$ & $15.95$ & $0.000$\\
+			 & Session & $12.56 \pm 1.64$ & $\mathbf{6.00 \pm 1.08}$ & $25.37$ &  $0.000$\\ \addlinespace
+			H & Packet & $13.82 \pm 2.26$ & $\mathbf{6.35 \pm 1.81}$ & $27.07$ & $0.000$ \\
+			& Session & $6.98 \pm 1.42$ & $\mathbf{2.75 \pm 0.67}$ & $21.49$ & $0.000$ \\ \addlinespace
+			P & Packet & $\mathbf{80.51 \pm 3.01}$ & $81.41 \pm 3.27$ & $-4.14$ & $1.000$ \\
+			& Session & $73.59 \pm 3.62$ & $73.95 \pm 3.70$ & $-1.23$ & $0.887$ \\ \addlinespace
+			VNG++ & Packet & $\mathbf{78.93 \pm 2.67}$ & $79.82 \pm 2.89$ & $-4.70$ & $1.000$ \\
+			& Session & $\mathbf{74.44 \pm 3.19}$ & $77.31 \pm 2.93$ & $-11.25$ & $1.000$ \\ \addlinespace
+			CUMUL & Packet & $84.11\pm 3.02$ & $84.32 \pm 3.05$ & $-1.54$ & $0.936$\\
+			& Session & $\mathbf{83.61 \pm 3.16}$ & $84.21 \pm 3.04$ & $-4.69$ & $1.000$ \\
 			\bottomrule
 		\end{tabular}
-		\caption[Significance Testing of padding performance for $n = 128$]{Significance Testing of padding performance for $n = 128$. $\mu^*_u$ and $\mu^*_g$ denote the observed average classifier accuracy for uniform and Gaussian padding, respectively. $\alpha$ denotes the probability of a Type I error when rejecting the null hypothesis that the real mean $\mu_g$ is greater than or equal to $\mu_u$. Significantly better values wrt. a significance level of 99\% are printed bold. }
+		\caption[Significance Testing of padding performance for $n = 128$]{Significance Testing of padding performance for $n = 128$. $\mu^*_u$ and $\mu^*_g$ denote the observed average classifier accuracy for uniform and Gaussian padding, respectively. The value of the $t$-statistic is reported together with $\alpha$, the probability of committing a Type I error when rejecting the null hypothesis that the real mean $\mu_g$ is greater than or equal to $\mu_u$. Significantly better values wrt. a significance level of 99\% are printed bold. }
 		\label{tbl:sig_score}
 	\end{table}
 
 	\section{Estimated Security Bounds}
 	\label{security_bounds}
 	
-	Table \ref{tbl:error_bound} shows the results of error bound estimation in the closed world and open world scenarios for all combinations of attack and defense. The estimated bounds differ largely between defenses, while some are very close to the observed classifier error. In particular, the results for the packet random schemes in the closed world scenario are closest to the empirical classifier error of the LL and H attacks. In contrast, the error bound of the Session Random Uniform defense is really far from the classifier error of those attacks, reaching over 80\% difference for the H attack. 
+	Table \ref{tbl:error_bound} shows the results of error bound estimation in the closed world and open world scenarios for all combinations of attack and defense. The estimated bounds differ largely between defenses, while some are very close to the observed classifier error. In particular, the results for the packet random schemes in the closed world scenario are closest to the empirical classifier error of the LL and H attacks. In contrast, the error bound of the Session Random Uniform defense is really far from the classifier error of those attacks, reaching over 80\% difference for the H attack. The closest match goes to the P classifier for session random Gaussian padding, hitting the empirical classification error almost perfectly.
 	
-	\paragraph{Closed World Scenario} The error bounds in the closed world scenario display a similar behavior as the classifier accuracy, showing Gaussian padding schemes as superior against the LL and H attacks, while uniform schemes have an advantage against VNG++ and CUMUL. Different from the empirical classifier error, however, is the error bound of the P attack, which reaches the highest value for Session Random Gaussian padding. Notably, the error bounds of the CUMUL attack are all very close to each other, laying within a range of 0.5\%, repeating the measurements of classifier performance that also were very close.
+	\paragraph{Closed World Scenario} The error bounds in the closed world scenario display a similar behavior as the classifier accuracy, showing Gaussian padding schemes as superior against the LL and H attacks, while uniform schemes have an advantage against VNG++ and CUMUL. Different from the empirical classifier error, however, is the error bound of the P attack, which reaches the highest value for Session Random Gaussian padding. Notably, the error bounds of the CUMUL attack are all very close to each other, laying within a range of roughly 0.5\%, repeating the measurements of classifier performance that also were very close.
 	
-	\paragraph{Open World (One-vs-All) Scenario} As opposed to the closed world, the one-vs-all scenario results in considerably lower error bounds throughout all measurements. The general relationship between the attacks and defenses, however, is mostly the same, with Gaussian padding winning against LL and H and uniform padding leading to better results against VNG++ and CUMUL. For the P attack, the packet random schemes do not differ while Session Random Gaussian wins over Session Random Uniform. Generally speaking, in the open world scenario, the error bound differences are relatively small within the same attack, laying all within a range of less than 1.5\% for P, VNG++ and CUMUL when applying any defense. For the CUMUL attack, the difference between using no defense and the best-performing defense (Session Random Uniform) is even only 0.18\%. In constrast to that, the LL and H attacks are showing larger differences between error bounds for different defenses.
+	\paragraph{Open World (One-vs-All) Scenario} As opposed to the closed world, the one-vs-all scenario results in considerably lower error bounds throughout all measurements. The general relationship between the attacks and defenses, however, is mostly the same, with Gaussian padding winning against LL and H and uniform padding leading to better results against VNG++ and CUMUL. For the P attack, the packet random schemes do not differ while Session Random Gaussian wins over Session Random Uniform. Generally speaking, in the open world scenario, the error bound differences are relatively small within the same attack, laying all within a range of less than 1.5\% for P, VNG++ and CUMUL when applying any defense. For the CUMUL attack, the difference between using no defense and the best-performing defense (Session Random Uniform) is even only 0.22\%. In constrast to that, the LL and H attacks are showing larger differences between error bounds for different defenses.
 
 	\begin{table}
-		% TODO New values and make all numbers math mode
 		\centering
 		\small
 		\begin{tabular}{llcccc}
@@ -679,42 +689,42 @@
 			& & \multicolumn{2}{c}{\textbf{Closed World}} & \multicolumn{2}{c}{\textbf{Open World (One vs All)}} \\
 			\textbf{Attack} & \textbf{Defense} & $\mathbf{\widehat{R}^*}$ \textbf{(\%)} & $\mathbf{\varepsilon}\textbf{-Privacy}$ & $\mathbf{\widehat{R}^*}$ \textbf{(\%)} & $\mathbf{\varepsilon}\textbf{-Privacy}$ \\
 			\midrule
-			\textbf{LL} & None & $4.76 \pm 1.55$ & 0.05 & $1.47\pm 0.20$ & 0.03 \\
-			 & Packet Random Uniform & $37.09 \pm 2.12$ & 0.37 & $6.09\pm 0.62$ & 0.12 \\
-			 & Packet Random Gaussian & $\mathbf{55.65 \pm 2.48}$ & \textbf{0.56} & $\mathbf{16.86\pm 1.58}$ & \textbf{0.34} \\
-			 & Session Random Uniform & $15.42 \pm 1.77$ & 0.16 & $5.81\pm 0.38$ & 0.12 \\
-			 & Session Random Gaussian & $41.01 \pm 1.40$ & 0.41 & $13.26\pm 0.72$ & 0.27 \\ \addlinespace
+			\textbf{LL} & None & $5.14 \pm 1.18$ & $0.05$ & $1.64 \pm 0.20$ & $0.03$ \\
+			 & Packet Random Uniform & $40.18 \pm 1.74$ & $0.41$ & $6.19 \pm 0.57$ & $0.12$ \\
+			 & Packet Random Gaussian & $\mathbf{58.41 \pm 2.35}$ & $\mathbf{0.59}$ & $\mathbf{16.55 \pm 1.37}$ & $\mathbf{0.33}$ \\
+			 & Session Random Uniform & $16.67 \pm 1.35$ & $0.17$ & $6.00 \pm 0.35$ & $0.12$ \\
+			 & Session Random Gaussian & $42.22 \pm 1.07$ & $0.43$ & $13.38 \pm 0.57$ & $0.27$ \\ \addlinespace
 			 
-		    \textbf{H} & None & $3.69 \pm 1.50$ & 0.04 & $1.42\pm 0.14$ & 0.03 \\
-			 & Packet Random Uniform & $56.51 \pm 2.04$ & 0.57 & $14.97\pm 1.26$ & 0.30 \\
-			 & Packet Random Gaussian & $\mathbf{68.21 \pm 2.16}$ & \textbf{0.69} & $22.37\pm 2.65$ & 0.45 \\
-			 & Session Random Uniform & $9.44 \pm 1.52$ & 0.10 & $12.90\pm 0.32$ & 0.26 \\
-			 & Session Random Gaussian & $39.98 \pm 0.91$ & 0.40 & $\mathbf{29.84\pm 0.82}$ & \textbf{0.60} \\ \addlinespace
+		    \textbf{H} & None & $4.01 \pm 1.09$ & $0.04$ & $1.61 \pm 0.15$ & $0.03$ \\
+			 & Packet Random Uniform & $59.48 \pm 2.27$ & $0.60$ & $15.62 \pm 1.03$ & $0.31$ \\
+			 & Packet Random Gaussian & $\mathbf{71.42 \pm 1.79}$ & $\mathbf{0.72}$ & $23.77 \pm 1.75$ & $0.48$ \\
+			 & Session Random Uniform & $10.33 \pm 1.02$ & $0.10$ & $13.30 \pm 0.28$ & $0.27$ \\
+			 & Session Random Gaussian & $40.27 \pm 0.72$ & $0.41$ & $\mathbf{29.81 \pm 0.64}$ & $\mathbf{0.60}$ \\ \addlinespace
 			 
-			\textbf{P} & None & $5.11 \pm 1.54$ & 0.05 & $1.57 \pm 0.17$ & 0.01 \\
-			 & Packet Random Uniform & $10.76 \pm 1.97$ & 0.11 & $2.06 \pm 0.24$ & 0.04 \\
-			 & Packet Random Gaussian & $10.35 \pm 1.97$ & 0.10 & $2.06 \pm 0.26$ & 0.04 \\
-			 & Session Random Uniform & $14.26 \pm 1.84$ & 0.14 & $3.04 \pm 0.33$ & 0.06 \\
-			 & Session Random Gaussian & $\mathbf{24.57 \pm 1.97}$ & \textbf{0.25} & $\mathbf{3.41 \pm 0.36}$ & \textbf{0.07} \\ \addlinespace
+			\textbf{P} & None & $5.48 \pm 1.14$ & $0.06$ & $1.76 \pm 0.19$ & $0.04$ \\
+			 & Packet Random Uniform & $11.57 \pm 1.47$ & $0.12$ & $2.27 \pm 0.24$ & $0.05$ \\
+			 & Packet Random Gaussian & $11.03 \pm 1.44$ & $0.11$ & $2.26 \pm 0.21$ & $0.05$ \\
+			 & Session Random Uniform & $15.62 \pm 1.27$ & $0.16$ & $3.24 \pm 0.29$ & $0.06$ \\
+			 & Session Random Gaussian & $\mathbf{26.79 \pm 1.38}$ & $\mathbf{0.27}$ & $\mathbf{3.65 \pm 0.38}$ & $\mathbf{0.07}$ \\ \addlinespace
 			 
-			\textbf{VNG++} & None & $10.38 \pm 1.75$ & 0.10 & $2.46 \pm 0.33$ & 0.05 \\
-			 & Packet Random Uniform & $13.33\pm 1.87$ & 0.13 & $2.59 \pm 0.32$ & 0.05 \\
-			 & Packet Random Gaussian & $12.39 \pm 1.80$ & 0.13 & $2.54 \pm 0.33$ & 0.05 \\
-			 & Session Random Uniform & $\mathbf{17.22 \pm 1.98}$ & \textbf{0.17} & $\mathbf{3.13 \pm 0.35}$ & \textbf{0.06} \\
-			 & Session Random Gaussian & $14.94\pm 1.86$ & 0.15 & $2.82 \pm 0.31$ & \textbf{0.06} \\ \addlinespace
+			\textbf{VNG++} & None & $11.16 \pm 1.34$ & $0.11$ & $2.67 \pm 0.30$ & $0.05$ \\
+			 & Packet Random Uniform & $14.69 \pm 1.40$ & $0.15$ & $2.82 \pm 0.32$ & $0.06$ \\
+			 & Packet Random Gaussian & $13.47 \pm 1.44$ & $0.14$ & $2.73 \pm 0.32$ & $0.05$ \\
+			 & Session Random Uniform & $\mathbf{19.33 \pm 1.70}$ & $\mathbf{0.19}$ & $\mathbf{3.33 \pm 0.32}$ & $\mathbf{0.07}$ \\
+			 & Session Random Gaussian & $16.47 \pm 1.59$ & $0.17$ & $3.03 \pm 0.32$ & $0.06$ \\ \addlinespace
 			 
-			\textbf{CUMUL} & None & $7.30 \pm 1.56$  & 0.07 & $2.40\pm 0.32$ & 0.05 \\
-			 & Packet Random Uniform & $8.49 \pm 1.72$ & \textbf{0.09} & $2.49 \pm 0.32$ & 0.05 \\
-			 & Packet Random Gaussian & $8.08 \pm 1.69$ & 0.08 & $2.47\pm 0.31$ & 0.05 \\
-			 & Session Random Uniform & $\mathbf{8.52 \pm 1.66}$ & \textbf{0.09} & $\mathbf{2.58 \pm 0.32}$ & 0.05 \\
-			 & Session Random Gaussian & $8.15 \pm 1.66$ & 0.08 & $2.52\pm 0.36$ & 0.05 \\
+			\textbf{CUMUL} & None & $7.80 \pm 1.22$  & $0.08$ & $2.51 \pm 0.30$ & $0.05$ \\
+			 & Packet Random Uniform & $9.26 \pm 1.35$ & $\mathbf{0.09}$ & $2.62 \pm 0.30$ & $0.05$ \\
+			 & Packet Random Gaussian & $8.75 \pm 1.28$ & $\mathbf{0.09}$ & $2.59 \pm 0.31$ & $0.05$ \\
+			 & Session Random Uniform & $\mathbf{9.28 \pm 1.22}$ & $\mathbf{0.09}$ & $\mathbf{2.73 \pm 0.31}$ & $0.05$ \\
+			 & Session Random Gaussian & $8.81 \pm 1.23$ & $\mathbf{0.09}$ & $2.64 \pm 0.30$ & $0.05$ \\
 			\bottomrule
 		\end{tabular}
 		\caption[Error bound results for all attacks and defenses]{Error bound results for all attacks and defenses, showing the average error bound and standard deviation. The best value for each attack is printed in bold.}
 		\label{tbl:error_bound}
 	\end{table}
 
-	\begin{figure}
+	\begin{figure}[tbp]
 		\begin{subfigure}{0.495\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{plots/bounds_cw_pkt.png}
@@ -729,7 +739,7 @@
 		\caption[Lower Bounds for the Bayes Error in the closed world scenario]{Lower Bounds for the Bayes Error in the closed world scenario using Gaussian Padding on 100 Websites in comparison with uniform padding}
 		\label{fig:bound_cw}
 	\end{figure}
-	\begin{figure}
+	\begin{figure}[tbp]
 		\begin{subfigure}{0.495\textwidth}
 			\centering
 			\includegraphics[width=\textwidth]{plots/bounds_ow_pkt.png}
@@ -754,46 +764,44 @@
 	\begin{table}
 		\centering
 		\small
-		% TODO Add new error bound values
 		\begin{tabular}{llcccc}
 			\toprule \textbf{Attack} & \textbf{Scheme} & $\mathbf{\widehat{R}^*_u}$ \textbf{(\%)} & $\mathbf{\widehat{R}^*_g}$  \textbf{(\%)} & $\mathbf{t}$ & $\mathbf{\alpha}$ \\
-			\midrule LL & Packet & $37.09 \pm 2.12$ & $\mathbf{55.65 \pm 2.48}$ & $-58.30$ & $0.000$\\
-			& Session & $15.42 \pm 1.78$ & $\mathbf{41.01 \pm 1.40}$ & $-151.47$ &  $0.000$\\ \addlinespace
-			H & Packet & $56.525 \pm 2.04$ & $\mathbf{68.21 \pm 2.16}$ & $-36.45$ & $0.000$ \\
-			& Session & $9.44 \pm 1.52$ & $\mathbf{39.98 \pm 0.91}$ & $-223.88$ & $0.000$ \\ \addlinespace
-			P & Packet & $\mathbf{10.76 \pm 1.97}$ & $10.35 \pm 1.97$ & $11.51$ & $1.000$ \\
-			& Session & $14.26 \pm 1.84$ & $\mathbf{24.57 \pm 1.97}$ & $-63.20$ & $0.000$ \\ \addlinespace
-			VNG++ & Packet & $\mathbf{13.33 \pm 1.87}$ & $12.39 \pm 1.80$ & $21.32$ & $1.000$ \\
-			& Session & $\mathbf{17.22 \pm 1.98}$ & $14.94 \pm 1.86$ & $36.90$ & $1.000$ \\ \addlinespace
-			CUMUL & Packet & $\mathbf{8.49\pm 1.72}$ & $8.08 \pm 1.69$ & $15.36$ & $1.000$\\
-			& Session & $\mathbf{8.52 \pm 1.66}$ & $8.15 \pm 1.66$ & $16.28$ & $1.000$ \\
+			\midrule LL & Packet & $40.18 \pm 1.74$ & $\mathbf{58.41 \pm 2.35}$ & $-67.41$ & $0.000$\\
+			& Session & $16.67 \pm 1.35$ & $\mathbf{42.22 \pm 1.07}$ & $-223.31$ &  $0.000$\\ \addlinespace
+			H & Packet & $59.48 \pm 2.27$ & $\mathbf{71.42 \pm 1.79}$ & $-43.45$ & $0.000$ \\
+			& Session & $10.33 \pm 1.02$ & $\mathbf{40.27 \pm 0.72}$ & $-364.85$ & $0.000$ \\ \addlinespace
+			P & Packet & $\mathbf{11.57 \pm 1.47}$ & $11.03 \pm 1.44$ & $21.57$ & $1.000$ \\
+			& Session & $15.62 \pm 1.27$ & $\mathbf{26.79 \pm 1.38}$ & $-107.60$ & $0.000$ \\ \addlinespace
+			VNG++ & Packet & $\mathbf{14.69 \pm 1.40}$ & $13.47 \pm 1.44$ & $30.64$ & $1.000$ \\
+			& Session & $\mathbf{19.33 \pm 1.70}$ & $16.47 \pm 1.59$ & $42.02$ & $1.000$ \\ \addlinespace
+			CUMUL & Packet & $\mathbf{9.26 \pm 1.35}$ & $8.75 \pm 1.28$ & $19.34$ & $1.000$\\
+			& Session & $\mathbf{9.28 \pm 1.22}$ & $8.81 \pm 1.23$ & $20.51$ & $1.000$ \\
 			\bottomrule
 		\end{tabular}
-		\caption[Significance Testing of error bounds in the closed world scenario]{Significance Testing of error bounds in the closed world scenario. $\widehat{R}^*_u$ and $\widehat{R}^*_g$ denote the observed average error bound for uniform and Gaussian padding, respectively. $\alpha$ denotes the probability of a Type I error when rejecting the null hypothesis that the real mean $\widehat{R}_g$ is less than or equal to $\widehat{R}_u$. Significantly better values wrt. a significance level of 99\% are printed bold. }
+		\caption[Significance Testing of error bounds in the closed world scenario]{Significance Testing of error bounds in the closed world scenario. $\widehat{R}^*_u$ and $\widehat{R}^*_g$ denote the observed average error bound for uniform and Gaussian padding, respectively. The value of the $t$-statistic is reported together with $\alpha$, the probability of committing a Type I error when rejecting the null hypothesis that the real mean $\widehat{R}_g$ is less than or equal to $\widehat{R}_u$. Significantly better values wrt. a significance level of 99\% are printed bold. }
 		\label{tbl:sig_bound_cw}
 	\end{table}
 
-	\paragraph{Open World (One-vs-All) Scenario} The significance results for the open-world scenario are presented in Table \ref{tbl:sig_bound_ow}. The only combinations not yielding a significant difference were the P and CUMUL attacks against the packet random schemes, where no padding distribution brought any advantage. For LL and H, Gaussian padding had a significantly better error bound in both padding schemes, which also applies to the session random scheme and the P attack. The remaining cases, namely the VNG++ attack in both schemes, and the CUMUL attack in the session random scheme, uniform padding yielded a significantly higher bound, although not a large difference.
+	\paragraph{Open World (One-vs-All) Scenario} The significance results for the open-world scenario are presented in Table \ref{tbl:sig_bound_ow}. The only combinations not yielding a significant difference were the P and CUMUL attacks against the packet random schemes, where no padding distribution brought any advantage. For LL and H, Gaussian padding had a significantly better error bound in both padding schemes, which also applies to the session random scheme and the P attack. The remaining cases, namely the VNG++ attack in both schemes, and CUMUL in the session random scheme, uniform padding yielded a significantly higher bound, although not a large difference.
 	
 	\begin{table}
 		\centering
 		\small
-		% TODO Add new error bound values
 		\begin{tabular}{llcccc}
 			\toprule \textbf{Attack} & \textbf{Scheme} & $\mathbf{\widehat{R}^*_u}$ \textbf{(\%)} & $\mathbf{\widehat{R}^*_g}$  \textbf{(\%)} & $\mathbf{t}$ & $\mathbf{\alpha}$ \\
-			\midrule LL & Packet & $6.09 \pm 0.62$ & $\mathbf{16.86 \pm 1.58}$ & $-57.08$ & $0.000$\\
-			& Session & $5.81 \pm 0.38$ & $\mathbf{13.26 \pm 0.72}$ & $-87.46$ &  $0.000$\\ \addlinespace
-			H & Packet & $14.97 \pm 1.26$ & $\mathbf{22.37 \pm 2.65}$ & $-27.94$ & $0.000$ \\
-			& Session & $12.90 \pm 0.32$ & $\mathbf{29.84 \pm 0.82}$ & $-153.31$ & $0.000$ \\ \addlinespace
-			P & Packet & $2.06 \pm 0.24$ & $2.06 \pm 0.26$ & $0.13$ & $0.550$ \\
-			& Session & $3.04 \pm 0.33$ & $\mathbf{3.41 \pm 0.36}$ & $-11.74$ & $0.000$ \\ \addlinespace
-			VNG++ & Packet & $\mathbf{2.59 \pm 0.32}$ & $2.54 \pm 0.33$ & $3.15$ & $0.999$ \\
-			& Session & $\mathbf{3.13 \pm 0.35}$ & $2.82 \pm 0.31$ & $15.84$ & $1.000$ \\ \addlinespace
-			CUMUL & Packet & $2.49\pm 0.32$ & $2.47 \pm 0.31$ & $1.70$ & $0.952$\\
-			& Session & $\mathbf{2.58 \pm 0.32}$ & $2.52 \pm 0.36$ & $3.51$ & $1.000$ \\
+			\midrule LL & Packet & $6.19 \pm 0.57$ & $\mathbf{16.55 \pm 1.37}$ & $-67.51$ & $0.000$\\
+			& Session & $6.00 \pm 0.35$ & $\mathbf{13.38 \pm 0.57}$ & $-99.65$ &  $0.000$\\ \addlinespace
+			H & Packet & $15.62 \pm 1.03$ & $\mathbf{23.77 \pm 1.75}$ & $-37.22$ & $0.000$ \\
+			& Session & $13.30 \pm 0.28$ & $\mathbf{29.81 \pm 0.64}$ & $-197.72$ & $0.000$ \\ \addlinespace
+			P & Packet & $2.27 \pm 0.24$ & $2.26 \pm 0.21$ & $0.25$ & $0.600$ \\
+			& Session & $3.24 \pm 0.29$ & $\mathbf{3.65 \pm 0.38}$ & $-11.64$ & $0.000$ \\ \addlinespace
+			VNG++ & Packet & $\mathbf{2.82 \pm 0.32}$ & $2.73 \pm 0.32$ & $5.43$ & $1.000$ \\
+			& Session & $\mathbf{3.33 \pm 0.32}$ & $2.03 \pm 0.32$ & $16.04$ & $1.000$ \\ \addlinespace
+			CUMUL & Packet & $2.62\pm 0.30$ & $2.59 \pm 0.31$ & $1.90$ & $0.969$\\
+			& Session & $\mathbf{2.73 \pm 0.31}$ & $2.64 \pm 0.30$ & $8.09$ & $1.000$ \\
 			\bottomrule
 		\end{tabular}
-		\caption[Significance Testing of error bounds in the open world scenario]{Significance Testing of error bounds in the open world (one-vs-all) scenario. $\widehat{R}^*_u$ and $\widehat{R}^*_g$ denote the observed average error bound for uniform and Gaussian padding, respectively. $\alpha$ denotes the probability of a Type I error when rejecting the null hypothesis that the real mean $\widehat{R}_g$ is less than or equal to $\widehat{R}_u$. Significantly better values wrt. a significance level of 99\% are printed bold. }
+		\caption[Significance Testing of error bounds in the open world scenario]{Significance Testing of error bounds in the open world (one-vs-all) scenario. $\widehat{R}^*_u$ and $\widehat{R}^*_g$ denote the observed average error bound for uniform and Gaussian padding, respectively. The value of the $t$-statistic is reported together with $\alpha$, the probability of committing a Type I error when rejecting the null hypothesis that the real mean $\widehat{R}_g$ is less than or equal to $\widehat{R}_u$. Significantly better values wrt. a significance level of 99\% are printed bold. }
 		\label{tbl:sig_bound_ow}
 	\end{table}
 
